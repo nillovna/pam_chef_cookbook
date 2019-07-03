@@ -1,0 +1,21 @@
+# Attention! Chef configured
+#
+# /etc/nslcd.conf
+#
+# Configuration file for LDAP nameservice daemon. This file is needed by nslcd.
+#
+
+uid <%= @nslcd['uid'] %>
+gid <%= @nslcd['gid'] %>
+
+<% for @server in @nslcd['ldapservers'] -%>
+uri <%= @server %>
+<% end -%>
+
+base <%= @nslcd['base'] %>
+
+binddn <%= @nslcd['binddn'] %>
+bindpw <%= @nslcd['bindpw'] %>
+
+ssl <%= @nslcd['ssl'] %>
+tls_reqcert <%= @nslcd['tls_reqcert'] %>

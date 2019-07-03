@@ -1,0 +1,48 @@
+# Attention! Chef configured
+#
+# PAM configuration
+#
+# Config structure:
+# <module_interface>    <control_flag>    <module_name>    <module_arguments>
+#
+
+<% tab_int=0 %>
+<% tab_flag=0 %>
+<% tab_mod=0 %>
+<% for module_interface in @pamd.keys %>
+  <% if module_interface.length > tab_int %>
+    <% tab_int=module_interface.length %>
+  <% end %>
+  <% for module_name in @pamd[module_interface] %>
+    <% if module_name.key?('@include') %>
+      <% if module_name['@include'].length > tab_flag %>
+        <% tab_mod=module_name['@include'].length %>
+      <% end %>
+      <% if '@include'.length > tab_int %>
+        <% tab_int='@include'.length %>
+      <% end %>
+    <% else %>
+      <% if module_name['control_flag'].length > tab_flag %>
+        <% tab_flag=module_name['control_flag'].length %>
+      <% end %>
+      <% if module_name['module_name'].length > tab_mod %>
+        <% tab_mod=module_name['module_name'].length %>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>
+
+<% tab=4 %>
+<% for @module_interface in @pamd.keys %>
+  <% for module_name in @pamd[@module_interface] %>
+    <% if module_name.key?('@include') %>
+@include<% (tab_int - '@include'.length + tab).times do |space| %> <% end %><%= module_name['@include'] %>
+    <% else %>
+<%= module_name['ignore_log'] ? '-' : '' %><%= @module_interface -%>
+<% (tab_int - @module_interface.length + tab).times do |space| %> <% end %><%= module_name['control_flag'] -%>
+<% (tab_flag - module_name['control_flag'].length + tab).times do |space| %> <% end %><%= module_name['module_name'] -%>
+<% (tab_mod - module_name['module_name'].length + tab).times do |space| %> <% end %><% if module_name['module_arguments'].kind_of?(Array) %><%= module_name['module_arguments'].join(" ") %><% end %>
+    <% end %>
+  <% end %>
+
+<% end %>

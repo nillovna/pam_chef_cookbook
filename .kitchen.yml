@@ -1,0 +1,70 @@
+---
+
+driver:
+  name: vagrant
+
+provisioner:
+  name: chef_zero
+  data_bags_path: 'test/integration/default/data_bags'
+  # You may wish to disable always updating cookbooks in CI or other testing environments.
+  # For example:
+  #   always_update_cookbooks: <%= !ENV['CI'] %>
+  always_update_cookbooks: true
+
+verifier:
+  name: inspec
+
+platforms:
+  - name: ubuntu-16.04
+  - name: ubuntu-18.04
+  - name: debian-9
+  - name: centos-7
+  - name: freebsd-11.2
+
+suites:
+  - name: debian
+    run_list:
+      - recipe[pam_chef_cookbook::default]
+    verifier:
+      inspec_tests:
+        - test/integration/default
+    attributes:
+    includes:
+      - ubuntu-16.04
+      - ubuntu-18.04
+      - debian-9
+  - name: centos
+    run_list:
+      - recipe[pam_chef_cookbook::default]
+    verifier:
+      inspec_tests:
+        - test/integration/default
+    attributes:
+      pam:
+        nsswitch:
+          passwd: ['compat', 'files', 'ldap']
+          services: ['files', 'db']
+        nscd:
+          cache_names:
+            group:
+              positive-time-to-live: '600'
+              max-db-size: '30000000'
+            netgroup:
+              enable-cache: 'yes'
+        nslcd:
+          ldapservers: ['ldaps://ldap.example1.com', 'ldaps://ldap.example2.com/']
+          uid: root
+        pamd:
+          fingerprint-auth-ac:
+            password: []
+    includes:
+      - centos-7
+  - name: other
+    run_list:
+      - recipe[pam_chef_cookbook::default]
+    verifier:
+      inspec_tests:
+        - test/integration/default
+    attributes:
+    includes:
+      - freebsd-11.2

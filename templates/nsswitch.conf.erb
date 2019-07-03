@@ -1,0 +1,18 @@
+# Attention! Chef configured
+#
+# /etc/nsswitch.conf
+#
+# The Name Service Switch (NSS) configuration file. This file is needed by nscd.
+#
+
+<% tab_key=0 %>
+<% @nsswitch.keys.each do |key| %>
+  <% if key.length > tab_key %>
+    <% tab_key=key.length %>
+  <% end %>
+<% end %>
+
+<% tab=4 %>
+<% @nsswitch.each do |key,value| %>
+<%= key -%>:<% (tab_key - key.length + tab).times do |space| %> <% end %><%= value.join(" ") %>
+<% end %>
